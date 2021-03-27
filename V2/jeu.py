@@ -1,6 +1,8 @@
 import pygame
 import random
 import sys
+from example import eyet
+
 pygame.init()
 fps=30
 fpsclock=pygame.time.Clock()
@@ -15,7 +17,8 @@ noir=(0,0,0)
 vert=(0,255,0)
 
 #pas auquel le joueur se déplace
-step=10
+step = 0
+
 
 #ennemi
 class Ennemi:
@@ -70,12 +73,9 @@ def jeu():
         screen.blit(ennemi.nvlle_img_ennemi, (ennemi.x,ennemi.y))
         ennemi.rect_ennemi.topleft = (ennemi.x, ennemi.y)
 
-        key_input = pygame.key.get_pressed()   
-        if key_input[pygame.K_LEFT]:
-            joueur.x -= step
-    
-        if key_input[pygame.K_RIGHT]:
-            joueur.x += step
+        step = eyet()
+        joueur.x -= step
+        joueur.x += step
 
         if joueur.x > cadre_x-joueur.nvlle_img_joueur.get_size()[0] :
             joueur.x = cadre_x-joueur.nvlle_img_joueur.get_size()[0]
