@@ -35,8 +35,8 @@ class Ennemi:
 #joueur/fusee
 class Joueur:
     def __init__(self):
-        self.x = 100
-        self.y = 335
+        self.x = cadre_x  / 2
+        self.y = cadre_y - 60
         self.img_joueur = pygame.image.load('img/perso.jpg')
         self.nvlle_img_joueur = pygame.transform.scale(self.img_joueur, (50, 50)) 
         self.rect_joueur = self.nvlle_img_joueur.get_rect()
