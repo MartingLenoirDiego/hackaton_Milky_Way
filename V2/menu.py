@@ -1,4 +1,3 @@
-
 import pygame
 import random
 import sys
@@ -19,93 +18,92 @@ vert=(0,255,0)
 step=10
 
 #ennemi
-pos_x_ennemi = 200
-pos_y_ennemi = 300
-img_ennemi = pygame.image.load('square.png')
-nvlle_img_ennemi = pygame.transform.scale(img_ennemi, (50, 50)) 
-rect_ennemi = nvlle_img_ennemi.get_rect()
-rect_ennemi.topleft = (pos_x_ennemi, pos_y_ennemi)
+class Ennemi:
+    def __init__(self):
+        self.x = 200
+        self.y = 300
+        self.img_ennemi = pygame.image.load('square.png')
+        self.nvlle_img_ennemi = pygame.transform.scale(self.img_ennemi, (50, 50)) 
+        self.rect_ennemi = self.nvlle_img_ennemi.get_rect()
+        self.rect_ennemi.topleft = (self.x, self.y)
 
 #joueur/fusée
-pos_x_joueur = 100
-pos_y_joueur = 335
-img_joueur = pygame.image.load('perso.jpg')
-nvlle_img_joueur = pygame.transform.scale(img_joueur, (50, 50)) 
-rect_joueur = nvlle_img_joueur.get_rect()
-rect_joueur.topleft = (pos_x_joueur, pos_y_joueur)
-
-#vies
-pos_x_vie = 10
-pos_y_vie = 10
-img_vie = pygame.image.load('coeur.png')
-nbr_vies = 3
-
+class Joueur:
+    def __init__(self):
+        self.x = 100
+        self.y = 335
+        self.img_joueur = pygame.image.load('perso.jpg')
+        self.nvlle_img_joueur = pygame.transform.scale(self.img_joueur, (50, 50)) 
+        self.rect_joueur = self.nvlle_img_joueur.get_rect()
+        self.rect_joueur.topleft = (self.x, self.y)
+        self.nbr_vies = 3
+        self.img_vie = pygame.image.load('coeur.png')
 
 compteur = 1
-fin = "non"
 
-while True:
-    
-    if fin == "non" :
+def jeu():
+    fin = False
+    ennemi = Ennemi()
+    joueur = Joueur()
+    compteur = 1
+    while not fin:
         screen.fill(noir)
+
         for eve in pygame.event.get():
             if eve.type==pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
         if compteur%2 != 0 :
-            screen.blit(nvlle_img_joueur, (pos_x_joueur,pos_y_joueur))
-            rect_joueur.topleft = (pos_x_joueur, pos_y_joueur)
-
+            screen.blit(joueur.nvlle_img_joueur, (joueur.x,joueur.y))
+            joueur.rect_joueur.topleft = (joueur.x, joueur.y)
         else :
             screen.fill(noir)
         
         compteur = compteur - 1
-
         if compteur < 1 :
             compteur = 1
 
-        for i in range(nbr_vies) :
-            screen.blit(img_vie, (pos_x_vie + i * 40, pos_y_vie))
+        for i in range(joueur.nbr_vies) :
+            screen.blit(joueur.img_vie, (10 + i * 40, 10))
 
-
-        screen.blit(nvlle_img_ennemi, (pos_x_ennemi,pos_y_ennemi))
-        rect_ennemi.topleft = (pos_x_ennemi, pos_y_ennemi)
+        screen.blit(ennemi.nvlle_img_ennemi, (ennemi.x,ennemi.y))
+        ennemi.rect_ennemi.topleft = (ennemi.x, ennemi.y)
 
         key_input = pygame.key.get_pressed()   
         if key_input[pygame.K_LEFT]:
-            pos_x_joueur -= step
-        #enlever les pos_y_joueur pour pas qu'il puisse avancer
-        if key_input[pygame.K_UP]:
-            pos_y_joueur -= step
+            joueur.x -= step
+    
         if key_input[pygame.K_RIGHT]:
-            pos_x_joueur += step
-        if key_input[pygame.K_DOWN]:
-            pos_y_joueur += step
+            joueur.x += step
 
-        if pos_x_joueur > cadre_x-nvlle_img_joueur.get_size()[0] :
-            pos_x_joueur = cadre_x-nvlle_img_joueur.get_size()[0]
+        if joueur.x > cadre_x-joueur.nvlle_img_joueur.get_size()[0] :
+            joueur.x = cadre_x-joueur.nvlle_img_joueur.get_size()[0]
         
-        if pos_x_joueur < 0 :
-            pos_x_joueur = 0
+        if joueur.x < 0 :
+            joueur.x = 0
 
-        if rect_ennemi.colliderect(rect_joueur) :
-            pos_x_ennemi = random.randrange(0, 600)
-            pos_y_ennemi = random.randrange(0, 400)
+        if ennemi.rect_ennemi.colliderect(joueur.rect_joueur) :
+            ennemi.x = random.randrange(0, 600)
+            ennemi.y = random.randrange(0, 400)
             compteur = 9
-            nbr_vies = nbr_vies - 1
+            
+            joueur.nbr_vies = joueur.nbr_vies - 1
+            if joueur.nbr_vies == 0 :
+                fin = True
 
-            if nbr_vies == 0 :
-                fin = "oui"
-        
-    else :
+        pygame.display.update()
+        fpsclock.tick(fps)
+
+def main():
+    while True:
+        jeu()
         screen.fill(vert)
         for eve in pygame.event.get():
             if eve.type==pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-
-    pygame.display.update()
-    fpsclock.tick(fps)
+if __name__ == "__main__":
+    main()
     
