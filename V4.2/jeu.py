@@ -3,13 +3,14 @@ import random
 import sys
 import cv2
 import time
+from pygame import mixer
 from gaze_tracking import GazeTracking
 
 pygame.init()
-fps=30
+fps=60
 fpsclock=pygame.time.Clock()
-cadre_x = 1920
-cadre_y = 1080
+cadre_x = 1900
+cadre_y = 1000
 screen=pygame.display.set_mode((cadre_x, cadre_y))
 pygame.display.set_caption("Keyboard_Input")
 
@@ -47,8 +48,8 @@ class Ennemi:
 #joueur/fusee
 class Joueur:
     def __init__(self):
-        self.x = cadre_x  / 2
-        self.y = cadre_y - 200
+        self.x = (cadre_x  / 2) - 60
+        self.y = cadre_y - 300
         self.img_joueur = pygame.image.load('img/perso.jpg')
         self.nvlle_img_joueur = pygame.transform.scale(self.img_joueur, (50, 50)) 
         self.rect_joueur = self.nvlle_img_joueur.get_rect()
@@ -56,14 +57,17 @@ class Joueur:
         self.nbr_vies = 3
         self.img_vie = pygame.image.load('img/coeur.png')
         self.cooldown = 0
-    
+
 
 compteur = 1
 
 def jeu():
     fin = False
-    ennemi = Ennemi()
+    is_blinking = True
+    ennemi = Ennemi()    
     joueur = Joueur()
+    mixer.music.load("space.wav")
+    mixer.music.play(-1)
     compteur = 1
     gaze = GazeTracking()
     webcam = cv2.VideoCapture(0)
@@ -75,6 +79,7 @@ def jeu():
     compteur_tir = 0
     while not fin:
         screen.fill(noir)
+        
 
         for eve in pygame.event.get():
             if eve.type==pygame.QUIT:
@@ -96,6 +101,7 @@ def jeu():
 
         screen.blit(ennemi.nvlle_img_ennemi, (ennemi.x,ennemi.y))
         ennemi.rect_ennemi.topleft = (ennemi.x, ennemi.y)
+
         for tir in tirs:
             if tir.y < 0:
                 tirs.remove(tir)
@@ -103,15 +109,13 @@ def jeu():
             tir.dep()
             screen.blit(tir.new_img, (tir.x,tir.y))
             tir.rect.topleft = (tir.x, tir.y)
-        
+
         if len(tirs) != 0:
             joueur.cooldown +=1
             if joueur.cooldown  == 7:
                 joueur.cooldown = 0
-        if len(tirs) == 0:
+        elif len(tirs) == 0:
             joueur.cooldown = 0
-            
-
 
         _, frame = webcam.read()
 
@@ -140,19 +144,24 @@ def jeu():
             left_pupil_t2 = gaze.pupil_left_coords()
             right_pupil_t2 = gaze.pupil_right_coords()
             t1 = True
-        """
-        if gaze.is_blinking():
-            print("WINK")
-            """
         
-        key_input = pygame.key.get_pressed()   
+        
+
+        """key_input = pygame.key.get_pressed()   
         if key_input[pygame.K_SPACE]:
             if joueur.cooldown == 0:
+                tirs.append(Tir(joueur.x,joueur.y))"""
+        if gaze.is_blinking() :
+            if joueur.cooldown == 0 :
                 tirs.append(Tir(joueur.x,joueur.y))
-    
+                firing_shot = mixer.Sound("shoot.wav")
+                firing_shot.play()
+
+        
         elif ((left_pupil_t1 != None) and (right_pupil_t1!= None) and (left_pupil_t2 != None) and (right_pupil_t2 != None)):
             position = (((left_pupil_t1[0] - calibration_pos[0])/float(calibration_pos[0]))*100)
-            joueur.x -= 100* position
+            if position < -0.20 or position > 0.20:
+                joueur.x -= 40* position
 
         if joueur.x > cadre_x-joueur.nvlle_img_joueur.get_size()[0] :
             joueur.x = cadre_x-joueur.nvlle_img_joueur.get_size()[0]
