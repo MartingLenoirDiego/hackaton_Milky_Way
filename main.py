@@ -62,8 +62,8 @@ class Ennemi:
 
 class Joueur:
     def __init__(self):
-        self.x = x_gene //2
-        self.y = 950
+        self.x = x_gene /2
+        self.y = y_gene - 100
         self.img_joueur = pygame.image.load('ressources/navette.png')
         self.nvlle_img_joueur = pygame.transform.scale(self.img_joueur, (100, 100)) 
         self.rect_joueur = self.nvlle_img_joueur.get_rect()
@@ -89,7 +89,6 @@ def jeu():
     right_pupil_t2 = (0,0)
     calibration_pos = (0,0)
     tirs = []
-    compteur_tir = 0
     #différents monstres possible
     img_comete = "ressources/monstre5.png"
     img_navette = "ressources/monstre7.png"
@@ -167,10 +166,10 @@ def jeu():
         
 
         #limite du cadre pour le joueur
-        if joueur.x > x_gene - joueur.nvlle_img_joueur.get_size()[0] :
-            joueur.x = x_gene - joueur.nvlle_img_joueur.get_size()[0]
-        if joueur.x < 0 :
-            joueur.x = 0
+        if joueur.x > x_gene - joueur.nvlle_img_joueur.get_size()[0]  :
+            joueur.x = x_gene - joueur.nvlle_img_joueur.get_size()[0] -10
+        if joueur.x < 10 :
+            joueur.x = 10
 
         #fréquence pour l'augmentation +1 de la qtité des monstres
         if remplir_liste%20 == 0 :
@@ -205,16 +204,20 @@ def jeu():
             screen.blit(joueur.nvlle_img_vie, (5 + i * 30, 5))
 
         for tir in tirs:
+            for comete in liste_comete:
+                if tir.rect.colliderect(comete.rect_ennemi) :
+                    tir.x=2000
+                    comete.x = 2000
+                    tirs.remove(tir)
             if tir.y < 0:
                 tirs.remove(tir)
-                print(len(tirs))
             tir.dep()
             screen.blit(tir.new_img, (tir.x,tir.y))
             tir.rect.topleft = (tir.x, tir.y)
 
         if len(tirs) != 0:
             joueur.cooldown +=1
-            if joueur.cooldown  == 7:
+            if joueur.cooldown  == 15:
                 joueur.cooldown = 0
         elif len(tirs) == 0:
             joueur.cooldown = 0
@@ -258,7 +261,7 @@ def jeu():
         elif ((left_pupil_t1 != None) and (right_pupil_t1!= None) and (left_pupil_t2 != None) and (right_pupil_t2 != None)):
             position = (((left_pupil_t1[0] - calibration_pos[0])/float(calibration_pos[0]))*100)
             if position < -0.20 or position > 0.20:
-                joueur.x -= 40* position
+                joueur.x -= 30* position
                 
         #rafraichissement
         pygame.display.update()
