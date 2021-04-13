@@ -1,13 +1,13 @@
 import pygame
 import random
-from gaze_tracking import GazeTracking
-import time
 import sys
+from example import eyet
+
 pygame.init()
 fps=30
 fpsclock=pygame.time.Clock()
-cadre_x = 1920 
-cadre_y = 1080
+cadre_x = 600
+cadre_y = 400
 screen=pygame.display.set_mode((cadre_x, cadre_y))
 pygame.display.set_caption("Keyboard_Input")
 
@@ -17,7 +17,7 @@ noir=(0,0,0)
 vert=(0,255,0)
 
 #pas auquel le joueur se déplace
-step = 10
+step = 0
 
 
 #ennemi
@@ -33,8 +33,8 @@ class Ennemi:
 #joueur/fusée
 class Joueur:
     def __init__(self):
-        self.x = cadre_x / 2
-        self.y = cadre_y - 60
+        self.x = 100
+        self.y = 335
         self.img_joueur = pygame.image.load('img/perso.jpg')
         self.nvlle_img_joueur = pygame.transform.scale(self.img_joueur, (50, 50)) 
         self.rect_joueur = self.nvlle_img_joueur.get_rect()
@@ -73,12 +73,9 @@ def jeu():
         screen.blit(ennemi.nvlle_img_ennemi, (ennemi.x,ennemi.y))
         ennemi.rect_ennemi.topleft = (ennemi.x, ennemi.y)
 
-        key_input = pygame.key.get_pressed()   
-        if key_input[pygame.K_LEFT]:
-            joueur.x -= step
-    
-        if key_input[pygame.K_RIGHT]:
-            joueur.x += step
+        step = eyet()
+        joueur.x -= step
+        joueur.x += step
 
         if joueur.x > cadre_x-joueur.nvlle_img_joueur.get_size()[0] :
             joueur.x = cadre_x-joueur.nvlle_img_joueur.get_size()[0]
